@@ -9,13 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
-    # A MUDANÇA ESTÁ AQUI:
-    # Definimos o token para todo o "job", garantindo que todos os passos o usem.
+    # Mantemos o token no nível do job para garantir que o 'push' funcione
     env:
       GITHUB_TOKEN: ${{ secrets.SNAKE_PAT }}
 
     steps:
-      # 1. Faz o checkout do repositório usando o token correto
+      # 1. Faz o checkout do repositório
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.SNAKE_PAT }}
@@ -28,8 +27,12 @@ jobs:
           outputs: |
             dist/github-snake.svg
             dist/github-snake-dark.svg?palette=github-dark
+        # AQUI ESTÁ A ADIÇÃO CRUCIAL:
+        # Forçamos ESTE PASSO a usar o token para LER os seus dados privados.
+        env:
+          GITHUB_TOKEN: ${{ secrets.SNAKE_PAT }}
 
-      # 3. Commita e envia os arquivos, agora com a permissão correta
+      # 3. Commita e envia os arquivos
       - name: Commit and push generated files
         run: |
           git config user.name "github-actions[bot]"
