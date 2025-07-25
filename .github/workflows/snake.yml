@@ -8,6 +8,10 @@ on:
 
 jobs:
   build:
+    # Adicionamos a permissão de escrita aqui
+    permissions:
+      contents: write
+      
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,8 +21,7 @@ jobs:
           # Seu nome de usuário do GitHub
           github_user_name: ${{ github.repository_owner }}
 
-          # Lista de arquivos a serem gerados. Um por linha.
-          # As opções de customização são adicionadas como query string.
+          # Lista de arquivos a serem gerados.
           outputs: |
             dist/github-snake.svg
             dist/github-snake-dark.svg?palette=github-dark
