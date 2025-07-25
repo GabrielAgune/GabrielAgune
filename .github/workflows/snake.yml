@@ -8,11 +8,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      # 1. Faz o checkout do repositório
-      - uses: actions/checkout@v4
+    
+    # A MUDANÇA ESTÁ AQUI:
+    # Definimos o token para todo o "job", garantindo que todos os passos o usem.
+    env:
+      GITHUB_TOKEN: ${{ secrets.SNAKE_PAT }}
 
-      # 2. Gera os arquivos da animação usando o token com permissões
+    steps:
+      # 1. Faz o checkout do repositório usando o token correto
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SNAKE_PAT }}
+
+      # 2. Gera os arquivos da animação
       - name: Generate snake files
         uses: Platane/snk@v3
         with:
@@ -20,11 +28,8 @@ jobs:
           outputs: |
             dist/github-snake.svg
             dist/github-snake-dark.svg?palette=github-dark
-        env:
-          # AQUI ESTÁ A MUDANÇA: Usamos o PAT em vez do token padrão
-          GITHUB_TOKEN: ${{ secrets.SNAKE_PAT }}
 
-      # 3. Commita e envia os arquivos gerados
+      # 3. Commita e envia os arquivos, agora com a permissão correta
       - name: Commit and push generated files
         run: |
           git config user.name "github-actions[bot]"
