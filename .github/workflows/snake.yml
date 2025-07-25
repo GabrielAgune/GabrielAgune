@@ -7,15 +7,12 @@ on:
 
 jobs:
   build:
-    permissions:
-      contents: write # Permissão essencial para o push
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Faz o checkout do seu repositório para que o workflow possa acessá-lo
+      # 1. Faz o checkout do repositório
       - uses: actions/checkout@v4
 
-      # 2. Gera os arquivos da animação. A action vai criar uma pasta 'dist'
+      # 2. Gera os arquivos da animação usando o token com permissões
       - name: Generate snake files
         uses: Platane/snk@v3
         with:
@@ -23,14 +20,16 @@ jobs:
           outputs: |
             dist/github-snake.svg
             dist/github-snake-dark.svg?palette=github-dark
+        env:
+          # AQUI ESTÁ A MUDANÇA: Usamos o PAT em vez do token padrão
+          GITHUB_TOKEN: ${{ secrets.SNAKE_PAT }}
 
-      # 3. Commita e envia os arquivos gerados para a branch 'main'
+      # 3. Commita e envia os arquivos gerados
       - name: Commit and push generated files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add dist
-          # Faz o commit apenas se houverem alterações nos arquivos
           if ! git diff --staged --quiet; then
             git commit -m "feat: Generate new snake animation"
             git push
